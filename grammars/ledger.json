@@ -1,0 +1,200 @@
+{
+  "scopeName": "source.ledger",
+  "name": "Ledger",
+  "fileTypes": [
+    "ledger"
+  ],
+  "firstLineMatch": "-\\*-\\s*\\bledger\\b\\s*-\\*-",
+  "patterns": [
+    {
+      "name": "comment.line",
+      "match": "^[\\;#%|\\*].*$"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#transaction_uncleared"
+    },
+    {
+      "include": "#transaction_pending"
+    },
+    {
+      "include": "#transaction_cleared"
+    }
+  ],
+  "repository": {
+    "account": {
+      "match": "\\b(([^\\s#%|\\*\\;\\(\\)\\]\\[] ?)+)\\b",
+      "name": "string.account"
+    },
+    "commodity": {
+      "match": "([^\\s#%|\\*\\;\\(\\)\\]\\[]+)",
+      "name": "string.commodity"
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "match": "^([@!]?account\\b)\\s+(.*)$",
+          "captures": {
+              "1" : {
+                "name": "keyword.account"
+              },
+              "2": {
+                "patterns": [
+                  {
+                    "include": "#account"
+                  }
+                ]
+              }
+            }
+        },
+        {
+          "match": "^([@!]?commodity\\b)\\s+(.*)$",
+          "captures": {
+              "1" : {
+                "name": "keyword.commodity"
+              },
+              "2": {
+                "patterns": [
+                  {
+                    "include": "#commodity"
+                  }
+                ]
+              }
+            }
+        },
+        {
+          "match": "^[@!]?(alias|assert|bucket|capture|check|define|include|tag|year|Y)\\b",
+          "name": "keyword.directive"
+        }
+      ]
+    },
+    "transaction_comment": {
+      "name": "comment.transaction",
+      "match": "\\;.*$"
+    },
+    "transaction_number": {
+      "match": "^(\\d+)\\s+",
+      "captures": {
+          "1" : {
+            "name": "constant.numeric.transaction"
+          }
+        }
+    },
+    "transaction_amount": {
+      "match": "\\s{2}([\\-\\+]?\\d+([,\\.]\\d+)*)",
+      "captures": {
+        "1": {
+          "name": "constant.numeric.amount"
+        }
+      }
+    },
+    "transaction_posting": {
+      "name": "entity.transaction.posting",
+      "begin": "^(\\s+)",
+      "end": "$",
+      "patterns": [
+        {
+          "include": "#transaction_comment"
+        },
+        {
+          "include": "#account"
+        },
+        {
+          "include": "#transaction_amount"
+        }
+      ]
+    },
+    "transaction_uncleared": {
+      "name":
+        "meta.transaction.uncleared",
+      "begin":
+        "^(\\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})\\s+(?!([\\!\\*])\\s+)(.*)$",
+      "beginCaptures": {
+        "1": {
+          "name": "constant.numeric.date.transaction"
+        },
+        "3": {
+          "name": "string.payee.transaction",
+          "patterns": [
+            {
+              "include": "#transaction_number"
+            },
+            {
+              "include": "#transaction_comment"
+            }
+          ]
+        }
+      },
+      "end": "(?=^[\\S\\n\\r\\f])",
+      "patterns": [
+        {
+            "include": "#transaction_posting"
+        }
+      ]
+    },
+    "transaction_pending": {
+      "name":
+        "meta.transaction.pending",
+      "begin":
+        "^(\\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})\\s+(\\!)\\s+(.*)$",
+      "beginCaptures": {
+        "1": {
+          "name": "constant.numeric.date.transaction"
+        },
+        "2": {
+          "name": "keyword.transaction.pending"
+        },
+        "3": {
+          "name": "string.payee.transaction",
+          "patterns": [
+            {
+              "include": "#transaction_number"
+            },
+            {
+              "include": "#transaction_comment"
+            }
+          ]
+        }
+      },
+      "end": "(?=^[\\S\\n\\r\\f])",
+      "patterns": [
+        {
+            "include": "#transaction_posting"
+        }
+      ]
+    },
+    "transaction_cleared": {
+      "name":
+        "meta.transaction.cleared",
+      "begin":
+        "^(\\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})\\s+(\\*)\\s+(.*)$",
+      "beginCaptures": {
+        "1": {
+          "name": "constant.numeric.date.transaction"
+        },
+        "2": {
+          "name": "keyword.transaction.cleared"
+        },
+        "3": {
+          "name": "string.payee.transaction",
+          "patterns": [
+            {
+              "include": "#transaction_number"
+            },
+            {
+              "include": "#transaction_comment"
+            }
+          ]
+        }
+      },
+      "end": "(?=^[\\S\\n\\r\\f])",
+      "patterns": [
+        {
+            "include": "#transaction_posting"
+        }
+      ]
+    }
+  }
+}
