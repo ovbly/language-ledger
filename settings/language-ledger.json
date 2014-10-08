@@ -1,0 +1,9 @@
+{
+  ".source.ledger": {
+    "editor": {
+      "foldEndPattern": "'^\\S",
+      "commentStart": "; ",
+      "increaseIndentPattern": "^(=\\s|(\\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})).*$"
+    }
+  }
+}

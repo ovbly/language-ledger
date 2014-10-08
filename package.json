@@ -1,0 +1,16 @@
+{
+  "name": "language-ledger",
+  "main": "./lib/language-ledger",
+  "version": "0.1.0",
+  "description": "Ledger language support in Atom",
+  "repository": "https://github.com/4ourbit/language-ledger",
+  "license": "MIT",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "dependencies": {
+    "javascript-state-machine": "^2.3.5",
+    "ledger-cli": "https://github.com/4ourbit/node-ledger/tarball/master",
+    "pluralize": "^1.1.2"
+  }
+}
