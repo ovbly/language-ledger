@@ -1,4 +1,4 @@
-# Ledger language support in Atom
+# Ledger language support in Atom [![Build Status](https://travis-ci.org/4ourbit/language-ledger.svg?branch=master)](https://travis-ci.org/4ourbit/language-ledger)
 
 Adds syntax highlighting and parser reports to Ledger files in Atom.
 
