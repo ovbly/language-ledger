@@ -4,7 +4,7 @@ describe "Ledger grammar", ->
   [grammar] = []
 
   beforeEach ->
-    grammarFile = path.join __dirname, '../grammars/ledger.json'
+    grammarFile = path.join __dirname, '../grammars/ledger.cson'
     grammar = atom.grammars.readGrammarSync grammarFile
 
   it "parses the grammar", ->
@@ -17,6 +17,7 @@ describe "Ledger grammar", ->
         'keyword.account': ['account']
         'keyword.commodity': ['commodity']
         'keyword.directive': [
+          'apply tag', 'end tag',
           'alias',
           'assert',
           'bucket',
@@ -45,6 +46,7 @@ describe "Ledger grammar", ->
         expect(tokens[0].value).toMatch /[Tt]his/
         expect(tokens[0].scopes).toEqual ['source.ledger', 'comment.line']
 
+# TODO
     xit "tokenizes block directives and block comments", ->
       directiveLists =
         'directive.block': ['apply account', 'apply tag']
@@ -134,19 +136,22 @@ end #{directive}
       expect(tokens[2].value).toEqual '*'
       expect(tokens[2].scopes).toEqual clearedTransaction.concat ['keyword.transaction.cleared']
 
-  xdescribe "indentation", ->
-    editor = null
-
+  describe "indentation", ->
     beforeEach ->
+      waitsForPromise ->
+        atom.packages.activatePackage('language-ledger')
+
+    expectPreservedIndentation = (text) ->
       editor = new TextEditor({})
       editor.setGrammar(grammar)
 
-    expectPreservedIndentation = (text) ->
-      editor.setText(text)
-      editor.autoIndentBufferRows(0, editor.getLineCount() - 1)
+      editor.insertText(text)
+      editor.selectAll()
+      editor.autoIndentSelectedRows()
 
-      expectedLines = text.split("\n")
       actualLines = editor.getText().split("\n")
+      expectedLines = text.split("\n")
+
       for actualLine, i in actualLines
         expect([
           actualLine,
@@ -154,63 +159,12 @@ end #{directive}
         ]).toEqual([
           expectedLines[i],
           editor.indentLevelForLine(expectedLines[i])
-        ])
+        ], "on line #{i+1}")
 
-    it "indents allman-style curly braces", ->
-      expectPreservedIndentation """
-        if (true)
-        {
-          for (;;)
-          {
-            while (true)
-            {
-              x();
-            }
-          }
-        }
-        else
-        {
-          do
-          {
-            y();
-          } while (true);
-        }
-      """
+    it "preserves fixture indentation", ->
+      fixture = null
+      waitsForPromise ->
+        atom.project.open('drewr3.dat', autoIndent: false).then (o) -> fixture = o
 
-    it "indents non-allman-style curly braces", ->
-      expectPreservedIndentation """
-        if (true) {
-          for (;;) {
-            while (true) {
-              x();
-            }
-          }
-        } else {
-          do {
-            y();
-          } while (true);
-        }
-      """
-
-    it "indents collection literals", ->
-      expectPreservedIndentation """
-        [
-          {
-            a: b,
-            c: d
-          },
-          e,
-          f
-        ]
-      """
-
-    it "indents function arguments", ->
-      expectPreservedIndentation """
-        f(
-          g(
-            h,
-            i
-          ),
-          j
-        );
-      """
+      runs ->
+        expectPreservedIndentation fixture.getText()

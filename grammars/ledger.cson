@@ -1,0 +1,112 @@
+scopeName: "source.ledger"
+name: "Ledger"
+fileTypes: ["ledger"]
+firstLineMatch: "-\\*-\\s*\\bledger\\b\\s*-\\*-"
+patterns: [
+  {include: "#comment_line"}
+  {include: "#keywords"}
+  {include: "#transaction_uncleared"}
+  {include: "#transaction_pending"}
+  {include: "#transaction_cleared"}
+  {include: "#automatic_transaction"}
+]
+repository:
+  account:
+    match: "\\b(([^\\s#%|\\*\\;\\(\\)\\]\\[] ?)+)\\b"
+    name: "string.account"
+  commodity:
+    match: "([^\\s#%|\\*\\;\\(\\)\\]\\[]+)"
+    name: "string.commodity"
+  comment_line:
+    match: "^[\\;#%|\\*].*$"
+    name: "comment.line"
+  keyword_account:
+    match: "^([@!]?account\\b)\\s+(.*)$"
+    captures:
+      1: {name: "keyword.account"}
+      2: {patterns: [{include: "#account"}]}
+  keyword_commodity:
+    match: "^([@!]?commodity\\b)\\s+(.*)$"
+    captures:
+      1: {name: "keyword.commodity"}
+      2: {patterns: [{include: "#commodity"}]}
+  keyword_others:
+    match: "^[@!]?(apply tag|end tag|alias|assert|bucket|capture|check|define|include|tag|year|Y)\\b"
+    name: "keyword.directive"
+  keywords:
+    patterns: [
+      {include: "#keyword_account"}
+      {include: "#keyword_commodity"}
+      {include: "#keyword_others"}
+    ]
+  transaction_comment:
+    name: "comment.transaction"
+    match: "\\;.*$"
+  transaction_number:
+    match: "^[\\(]?([\\d]+)[\\)]?\\s+"
+    captures:
+      1: {name: "constant.numeric.transaction"}
+  transaction_amount:
+    match: "\\s{2}([\\-\\+]?\\d+([,\\.]\\d+)*)"
+    captures:
+      1: {name: "constant.numeric.amount"}
+  transaction_posting:
+    name: "entity.transaction.posting"
+    begin: "^(\\s+)"
+    end: "$"
+    patterns: [
+      {include: "#transaction_comment"}
+      {include: "#account"}
+      {include: "#transaction_amount"}
+    ]
+  transaction_uncleared:
+    name: "meta.transaction.uncleared"
+    begin: "(?x)
+        ^(\\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})
+          \\s+ (?!([\\!\\*])\\s+) (.*) $"
+    beginCaptures:
+      1: {name: "constant.numeric.date.transaction"}
+      3:
+        name: "string.payee.transaction"
+        patterns: [
+          {include: "#transaction_number"}
+          {include: "#transaction_comment"}
+        ]
+    end: "(^\\s+$)|(?=(^\\S))"
+    patterns: [{include: "#transaction_posting"}]
+  transaction_pending:
+    name: "meta.transaction.pending"
+    begin: "^(\\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})\\s+(\\!)\\s+(.*)$"
+    beginCaptures:
+      1: {name: "constant.numeric.date.transaction"}
+      2: {name: "keyword.transaction.pending"}
+      3:
+        name: "string.payee.transaction",
+        patterns: [
+          {include: "#transaction_number"}
+          {include: "#transaction_comment"}
+        ]
+    end: "(^\\s+$)|(?=(^\\S))"
+    patterns: [{include: "#transaction_posting"}]
+  transaction_cleared:
+    name: "meta.transaction.cleared"
+    begin: "^(\\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})\\s+(\\*)\\s+(.*)$"
+    beginCaptures:
+      1: {name: "constant.numeric.date.transaction"}
+      2: {name: "keyword.transaction.cleared"}
+      3:
+        name: "string.payee.transaction"
+        patterns: [
+          {include: "#transaction_number"}
+          {include: "#transaction_comment"}
+        ]
+    end: "(^\\s+$)|(?=(^\\S))"
+    patterns: [{include: "#transaction_posting"}]
+  automatic_transaction:
+    name: "meta.automatic.transaction"
+    begin: "^(=)\\s*(.*)$"
+    beginCaptures:
+      1: {name: "keyword.automatic.transaction"}
+      2: {name: "entity.name.function.expression"}
+    end: "(^\\s+$)|(?=(^\\S))"
+    patterns: [{include: "#transaction_posting"}]
