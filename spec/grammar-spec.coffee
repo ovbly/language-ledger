@@ -152,14 +152,20 @@ end #{directive}
       actualLines = editor.getText().split("\n")
       expectedLines = text.split("\n")
 
+      WhitespaceLine = /^\s*$/
+
       for actualLine, i in actualLines
-        expect([
-          actualLine,
-          editor.indentLevelForLine(actualLine)
-        ]).toEqual([
-          expectedLines[i],
-          editor.indentLevelForLine(expectedLines[i])
-        ], "on line #{i+1}")
+        # Skip indentation check of whitespace-only lines, since the indents are
+        # usually wanted at manual input. The whitespace package will remove
+        # them, once the file is saved.
+        unless WhitespaceLine.test(actualLine)
+          expect([
+            actualLine,
+            editor.indentLevelForLine(actualLine)
+          ]).toEqual([
+            expectedLines[i],
+            editor.indentLevelForLine(expectedLines[i])
+          ], "on line #{i+1}")
 
     it "preserves fixture indentation", ->
       fixture = null
