@@ -1,0 +1,24 @@
+'.source.ledger':
+  editor:
+    commentStart: '; '       # editor:toggle-line-comments
+    autoIndent: true         # can be set in root scope only
+    autoIndentOnPaste: true  # can be set in root scope only
+    foldEndPattern: "'^\\s*"
+    increaseIndentPattern: '$.' # does never match
+    decreaseIndentPattern: '(?x) ^ \\s* (
+      (\\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})
+    | (=\\ )
+    | (apply\\ tag)
+    | (end\\ tag)
+    )' # decrease indent eval on non-whitespace insertion only
+
+'.source.ledger .meta.transaction':
+  editor:
+    increaseIndentPattern: '(?x) ^ (
+      (\\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})
+    | (=\\ )
+    )' # increase indent eval after newline insertion, w/ preceding row pattern
+
+'.source.ledger .comment.line':
+  editor:
+    decreaseIndentPattern: '^'
