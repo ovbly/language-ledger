@@ -90,8 +90,7 @@ module.exports =
   deactivate: ->
     console.log "deactivate"
     @subscriptions?.dispose()
-    @output?.detach()
+    @output?.clear()
 
   serialize: ->
     console.log "serialize"
-    ledgerViewState: @output?.serialize()
