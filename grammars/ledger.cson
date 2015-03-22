@@ -62,8 +62,11 @@ repository:
   transaction_uncleared:
     name: "meta.transaction.uncleared"
     begin: "(?x)
-        ^(\\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})
-          \\s+ (?!([\\!\\*])\\s+) (.*) $"
+      ^ ((?: \\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})
+          (?: = (?: \\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2}))?
+        )
+        \\s+ (?!([\\!\\*])\\s+) (.*) $
+    "
     beginCaptures:
       1: {name: "constant.numeric.date.transaction"}
       3:
@@ -76,7 +79,12 @@ repository:
     patterns: [{include: "#transaction_posting"}]
   transaction_pending:
     name: "meta.transaction.pending"
-    begin: "^(\\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})\\s+(\\!)\\s+(.*)$"
+    begin: "(?x)
+      ^ ((?: \\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})
+          (?: = (?: \\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2}))?
+        )
+        \\s+ (\\!) \\s+ (.*) $
+    "
     beginCaptures:
       1: {name: "constant.numeric.date.transaction"}
       2: {name: "keyword.transaction.pending"}
@@ -90,7 +98,12 @@ repository:
     patterns: [{include: "#transaction_posting"}]
   transaction_cleared:
     name: "meta.transaction.cleared"
-    begin: "^(\\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})\\s+(\\*)\\s+(.*)$"
+    begin: "(?x)
+      ^ ((?: \\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})
+          (?: = (?: \\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2}))?
+        )
+        \\s+ (\\*) \\s+ (.*) $
+    "
     beginCaptures:
       1: {name: "constant.numeric.date.transaction"}
       2: {name: "keyword.transaction.cleared"}
