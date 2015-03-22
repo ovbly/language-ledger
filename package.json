@@ -1,7 +1,7 @@
 {
   "name": "language-ledger",
   "main": "./lib/language-ledger",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Ledger language support in Atom",
   "repository": "https://github.com/4ourbit/language-ledger",
   "license": "MIT",
