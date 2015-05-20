@@ -11,13 +11,96 @@
     | (apply\\ tag)
     | (end\\ tag)
     )' # decrease indent eval on non-whitespace insertion only
+  autocomplete:
+    symbols:
+      directive:
+        suggestions: [
+          {
+            rightLabel: "Directive"
+            snippet: "account ${1:account}$0"
+            description: "Pre-declare valid account names"
+            descriptionMoreURL: "http://www.ledger-cli.org/3.0/doc/ledger3.html#Command-Directives"
+          }
+          {
+            rightLabel: "Directive"
+            snippet: "commodity ${1:commodity}$0"
+            description: "Pre-declare commodity names"
+            descriptionMoreURL: "http://www.ledger-cli.org/3.0/doc/ledger3.html#Command-Directives"
+          }
+          {
+            rightLabel: "Directive"
+            snippet: "alias ${1:alias}=${2:account}$0"
+            description: "Define an alias for an account name"
+            descriptionMoreURL: "http://www.ledger-cli.org/3.0/doc/ledger3.html#Command-Directives"
+          }
+          {
+            rightLabel: "Directive"
+            snippet: "assert ${1:boolean}$0"
+            description: "Throw an error if a condition is not met"
+            descriptionMoreURL: "http://www.ledger-cli.org/3.0/doc/ledger3.html#Command-Directives"
+          }
+          {
+            rightLabel: "Directive"
+            snippet: "bucket ${1:account}$0"
+            description: "Default account to use for balancing transactions"
+            descriptionMoreURL: "http://www.ledger-cli.org/3.0/doc/ledger3.html#Command-Directives"
+          }
+          {
+            rightLabel: "Directive"
+            snippet: "capture ${1:replacement} ${1:regexp}$0"
+            description: "Replace regexp'd account matches with another account"
+            descriptionMoreURL: "http://www.ledger-cli.org/3.0/doc/ledger3.html#Command-Directives"
+          }
+          {
+            rightLabel: "Directive"
+            snippet: "check ${1:boolean}$0"
+            description: "Issue a warning if a condition is not met"
+            descriptionMoreURL: "http://www.ledger-cli.org/3.0/doc/ledger3.html#Command-Directives"
+          }
+          {
+            rightLabel: "Directive"
+            snippet: "define ${1:variable}=${2:expression}$0"
+            description: "Define value expressions"
+            descriptionMoreURL: "http://www.ledger-cli.org/3.0/doc/ledger3.html#Command-Directives"
+          }
+          {
+            rightLabel: "Directive"
+            snippet: "include ${1:path}$0"
+            description: "Include the stated file"
+            descriptionMoreURL: "http://www.ledger-cli.org/3.0/doc/ledger3.html#Command-Directives"
+          }
+          {
+            rightLabel: "Directive"
+            snippet: "tag ${1:string}$0"
+            description: "Pre-declare tag names"
+            descriptionMoreURL: "http://www.ledger-cli.org/3.0/doc/ledger3.html#Command-Directives"
+          }
+          {
+            rightLabel: "Directive"
+            snippet: "year ${1:year}$0"
+            description: "Pre-declare year used for dates without a year"
+            descriptionMoreURL: "http://www.ledger-cli.org/3.0/doc/ledger3.html#Command-Directives"
+          }
+        ]
 
-'.source.ledger .meta.transaction':
+'.source.ledger .meta.transaction:not(.leading-whitespace)':
   editor:
     increaseIndentPattern: '(?x) ^ (
       (\\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})
     | (=\\ )
     )' # increase indent eval after newline insertion, w/ preceding row pattern
+  autocomplete:
+    symbols:
+      directive:
+        suggestions: [
+          ' '
+        ] # empty directive set while editing transactions
+
+'.source.ledger .string.account':
+  autocomplete:
+    symbols:
+      Account:
+        selector: '.string.account'
 
 '.source.ledger .comment.line':
   editor:
