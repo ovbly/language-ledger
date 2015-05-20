@@ -1,4 +1,5 @@
 {TextEditor} = require 'atom'
+path = require 'path'
 
 describe "Ledger grammar", ->
   [grammar] = []
