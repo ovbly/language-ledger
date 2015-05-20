@@ -6,7 +6,7 @@
   "repository": "https://github.com/4ourbit/language-ledger",
   "license": "MIT",
   "engines": {
-    "atom": ">0.50.0"
+    "atom": ">=0.199.0"
   },
   "dependencies": {
     "javascript-state-machine": "^2.3.5",
