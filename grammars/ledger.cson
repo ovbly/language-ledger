@@ -4,7 +4,7 @@ fileTypes: ["ledger"]
 firstLineMatch: "-\\*-\\s*\\bledger\\b\\s*-\\*-"
 patterns: [
   {include: "#comment_line"}
-  {include: "#keywords"}
+  {include: "#directive"}
   {include: "#transaction_uncleared"}
   {include: "#transaction_pending"}
   {include: "#transaction_cleared"}
@@ -20,25 +20,29 @@ repository:
   comment_line:
     match: "^[\\;#%|\\*].*$"
     name: "comment.line"
-  keyword_account:
-    match: "^([@!]?account\\b)\\s+(.*)$"
+  directive_account:
+    match: "^(account)\\b\\s+(.*)"
     captures:
       1: {name: "keyword.account"}
       2: {patterns: [{include: "#account"}]}
-  keyword_commodity:
-    match: "^([@!]?commodity\\b)\\s+(.*)$"
+  directive_commodity:
+    match: "^(commodity)\\b\\s+(.*)"
     captures:
       1: {name: "keyword.commodity"}
       2: {patterns: [{include: "#commodity"}]}
-  keyword_others:
-    match: "^[@!]?(apply tag|end tag|alias|assert|bucket|capture|check|define|include|tag|year|Y)\\b"
+  directive_others:
+    match: "^(apply tag|end tag|alias|assert|bucket|capture|check|define|include|tag|year|Y)\\b"
     name: "keyword.directive"
-  keywords:
-    patterns: [
-      {include: "#keyword_account"}
-      {include: "#keyword_commodity"}
-      {include: "#keyword_others"}
-    ]
+  directive:
+    match: "^[@!]?([A-Za-z].*)$"
+    name: "meta.directive"
+    captures:
+      1:
+         patterns: [
+           {include: "#directive_account"}
+           {include: "#directive_commodity"}
+           {include: "#directive_others"}
+         ]
   transaction_comment:
     name: "comment.transaction"
     match: "\\;.*$"

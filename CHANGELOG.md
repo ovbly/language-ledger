@@ -11,3 +11,6 @@
 
 ## 0.2.0
 * Autocomplete: accounts and directives
+
+## 0.2.1
+* Improved autocomplete

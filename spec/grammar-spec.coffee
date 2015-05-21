@@ -13,6 +13,19 @@ describe "Ledger grammar", ->
     expect(grammar.scopeName).toBe 'source.ledger'
 
   describe "grammar", ->
+    it "tokenizes line comments", ->
+      tokensByLines = grammar.tokenizeLines """
+; This is a single line comment,
+#  and this,
+%   and this,
+|    and this,
+*     and this.
+"""
+      for tokens in tokensByLines
+        expect(tokens[0].value).toMatch /[Tt]his/
+        expect(tokens[0].scopes).toEqual ['source.ledger', 'comment.line']
+
+  describe "directives", ->
     it "tokenizes directives", ->
       directiveLists =
         'keyword.account': ['account']
@@ -33,19 +46,7 @@ describe "Ledger grammar", ->
         for directive in list
           {tokens} = grammar.tokenizeLine directive
           expect(tokens[0].value).toEqual directive
-          expect(tokens[0].scopes).toEqual ['source.ledger', scope]
-
-    it "tokenizes line comments", ->
-      tokensByLines = grammar.tokenizeLines """
-; This is a single line comment,
-#  and this,
-%   and this,
-|    and this,
-*     and this.
-"""
-      for tokens in tokensByLines
-        expect(tokens[0].value).toMatch /[Tt]his/
-        expect(tokens[0].scopes).toEqual ['source.ledger', 'comment.line']
+          expect(tokens[0].scopes).toEqual ['source.ledger', 'meta.directive', scope]
 
 # TODO
     xit "tokenizes block directives and block comments", ->
@@ -63,21 +64,21 @@ end #{directive}
 """
           expect(tokensByLines[0][0].value).toEqual directive
           for tokens in tokensByLines
-            expect(tokens[0].scopes).toEqual ['source.ledger', scope]
+            expect(tokens[0].scopes).toEqual ['source.ledger', 'meta.directive', scope]
 
     it "tokenizes accounts declared by account directive", ->
       {tokens} = grammar.tokenizeLine('account equity')
       expect(tokens[2].value).toEqual 'equity'
-      expect(tokens[2].scopes).toEqual ['source.ledger', 'string.account']
+      expect(tokens[2].scopes).toEqual ['source.ledger', 'meta.directive', 'string.account']
 
     it "tokenizes commodities declared by commodity directive", ->
       {tokens} = grammar.tokenizeLine('commodity $')
       expect(tokens[2].value).toEqual '$'
-      expect(tokens[2].scopes).toEqual ['source.ledger', 'string.commodity']
+      expect(tokens[2].scopes).toEqual ['source.ledger', 'meta.directive', 'string.commodity']
 
       {tokens} = grammar.tokenizeLine('commodity EUR')
       expect(tokens[2].value).toEqual 'EUR'
-      expect(tokens[2].scopes).toEqual ['source.ledger', 'string.commodity']
+      expect(tokens[2].scopes).toEqual ['source.ledger', 'meta.directive', 'string.commodity']
 
   describe "transactions", ->
     it "tokenizes transactions", ->
