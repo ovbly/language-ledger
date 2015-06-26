@@ -47,7 +47,7 @@ repository:
     name: "comment.transaction"
     match: "\\;.*$"
   transaction_number:
-    match: "^[\\(]?([\\d]+)[\\)]?\\s+"
+    match: "^\\(([\\d]+)\\)"
     captures:
       1: {name: "constant.numeric.transaction"}
   transaction_amount:
