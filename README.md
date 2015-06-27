@@ -12,7 +12,8 @@ pull request to add snippets, make grammar tweaks, etc.
 
 Autocompletion uses the [autocomplete-plus](https://atom.io/packages/autocomplete-plus)
 package, that is bundled in Atom. In the `autocomplete-plus` settings pane
-*Default Provider* should be set to `Symbol`.
+*Default Provider* should be set to `Symbol`. The *Minimum Word Length* setting
+indicates when autocompletion is about to be triggered.
 
 ![Autocompletion](http://fs2.directupload.net/images/150521/xhkpxw44.gif)
 
