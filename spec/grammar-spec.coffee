@@ -83,7 +83,7 @@ end #{directive}
   describe "transactions", ->
     it "tokenizes transactions", ->
       tokensByLines = grammar.tokenizeLines """
-2015/01/01 1000 payee  ; comment
+2015/01/01 (1000) payee  ; comment
   foo   1.01  ; comment
   ; comment
   bar  -1.01
@@ -92,13 +92,11 @@ end #{directive}
       expectedLine0 = [
         {'2015/01/01': unclearedTransaction.concat ['constant.numeric.date.transaction']}
         {' '         : unclearedTransaction}
-        {'1000'      : unclearedTransaction.concat ['constant.numeric.transaction']}
+        {'(1000)'    : unclearedTransaction.concat ['constant.symbol.code.transaction']}
         {' '         : unclearedTransaction}
-        {'payee  '   : unclearedTransaction}
-# TODO right trim payee
-#        {'payee'     : unclearedTransaction.concat ['string.payee.transaction']}
-#        {'  '        : unclearedTransaction}
-        {'; comment' : unclearedTransaction.concat ['comment.transaction']}
+        {'payee'     : unclearedTransaction.concat ['string.payee.transaction']}
+        {'  '        : unclearedTransaction}
+        {'; comment' : unclearedTransaction.concat ['comment.note.transaction']}
       ]
 
       expect(tokensByLines[0].length).toEqual expectedLine0.length
