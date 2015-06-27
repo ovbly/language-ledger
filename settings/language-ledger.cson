@@ -98,6 +98,12 @@
       Account:
         selector: '.string.account'
 
+'.source.ledger .string.payee':
+  autocomplete:
+    symbols:
+      Payee:
+        selector: '.string.payee'
+
 '.source.ledger .comment.line':
   editor:
     decreaseIndentPattern: '^'

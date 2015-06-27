@@ -14,3 +14,7 @@
 
 ## 0.2.1
 * Improved autocomplete
+
+## 0.2.2
+* Improved payee syntax highlighting
+* Autocomplete: payees

@@ -48,8 +48,16 @@ repository:
     match: "\\;.*$"
   transaction_number:
     match: "^\\(([\\d]+)\\)"
+  transaction_payee:
+    match: "(?x)
+      ^ (\\(([\\d]+)\\))? \\s*
+        (.*?)
+        (\\s{2,}(\\;.*))? $
+    "
     captures:
-      1: {name: "constant.numeric.transaction"}
+      1: {name: "constant.other.symbol.code.transaction"}
+      3: {name: "string.payee.transaction"}
+      5: {name: "comment.note.transaction"}
   transaction_amount:
     match: "\\s{2}([\\-\\+]?\\d+([,\\.]\\d+)*)"
     captures:
@@ -69,15 +77,14 @@ repository:
       ^ ((?: \\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})
           (?: = (?: \\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2}))?
         )
-        \\s+ (?!([\\!\\*])\\s+) (.*) $
+        \\s+ (?!([\\!\\*])) \\s* (.*) $
     "
     beginCaptures:
       1: {name: "constant.numeric.date.transaction"}
       3:
-        name: "string.payee.transaction"
+        name: "entity.payee.transaction",
         patterns: [
-          {include: "#transaction_number"}
-          {include: "#transaction_comment"}
+          {include: "#transaction_payee"}
         ]
     end: "(^\\s+$)|(?=(^\\S))"
     patterns: [{include: "#transaction_posting"}]
@@ -87,16 +94,15 @@ repository:
       ^ ((?: \\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})
           (?: = (?: \\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2}))?
         )
-        \\s+ (\\!) \\s+ (.*) $
+        \\s+ (\\!) \\s* (.*) $
     "
     beginCaptures:
       1: {name: "constant.numeric.date.transaction"}
       2: {name: "keyword.transaction.pending"}
       3:
-        name: "string.payee.transaction",
+        name: "entity.payee.transaction",
         patterns: [
-          {include: "#transaction_number"}
-          {include: "#transaction_comment"}
+          {include: "#transaction_payee"}
         ]
     end: "(^\\s+$)|(?=(^\\S))"
     patterns: [{include: "#transaction_posting"}]
@@ -106,16 +112,15 @@ repository:
       ^ ((?: \\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2})
           (?: = (?: \\d{4}[/-]\\d{2}?[/-]\\d{2}?|\\d{2}?[/-]\\d{2}))?
         )
-        \\s+ (\\*) \\s+ (.*) $
+        \\s+ (\\*) \\s* (.*) $
     "
     beginCaptures:
       1: {name: "constant.numeric.date.transaction"}
       2: {name: "keyword.transaction.cleared"}
       3:
-        name: "string.payee.transaction"
+        name: "entity.payee.transaction",
         patterns: [
-          {include: "#transaction_number"}
-          {include: "#transaction_comment"}
+          {include: "#transaction_payee"}
         ]
     end: "(^\\s+$)|(?=(^\\S))"
     patterns: [{include: "#transaction_posting"}]
