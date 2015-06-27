@@ -92,11 +92,11 @@ end #{directive}
       expectedLine0 = [
         {'2015/01/01': unclearedTransaction.concat ['constant.numeric.date.transaction']}
         {' '         : unclearedTransaction}
-        {'(1000)'    : unclearedTransaction.concat ['constant.symbol.code.transaction']}
-        {' '         : unclearedTransaction}
-        {'payee'     : unclearedTransaction.concat ['string.payee.transaction']}
-        {'  '        : unclearedTransaction}
-        {'; comment' : unclearedTransaction.concat ['comment.note.transaction']}
+        {'(1000)'    : unclearedTransaction.concat ['entity.payee.transaction', 'constant.other.symbol.code.transaction']}
+        {' '         : unclearedTransaction.concat ['entity.payee.transaction']}
+        {'payee'     : unclearedTransaction.concat ['entity.payee.transaction', 'string.payee.transaction']}
+        {'  '        : unclearedTransaction.concat ['entity.payee.transaction']}
+        {'; comment' : unclearedTransaction.concat ['entity.payee.transaction', 'comment.note.transaction']}
       ]
 
       expect(tokensByLines[0].length).toEqual expectedLine0.length
