@@ -74,54 +74,95 @@ end #{directive}
     it "tokenizes commodities declared by commodity directive", ->
       {tokens} = grammar.tokenizeLine('commodity $')
       expect(tokens[2].value).toEqual '$'
-      expect(tokens[2].scopes).toEqual ['source.ledger', 'meta.directive', 'string.commodity']
+      expect(tokens[2].scopes).toEqual ['source.ledger', 'meta.directive', 'constant.other.symbol.commodity']
 
       {tokens} = grammar.tokenizeLine('commodity EUR')
       expect(tokens[2].value).toEqual 'EUR'
-      expect(tokens[2].scopes).toEqual ['source.ledger', 'meta.directive', 'string.commodity']
+      expect(tokens[2].scopes).toEqual ['source.ledger', 'meta.directive', 'constant.other.symbol.commodity']
 
   describe "transactions", ->
     it "tokenizes transactions", ->
       tokensByLines = grammar.tokenizeLines """
 2015/01/01 (1000) payee  ; comment
-  foo   1.01  ; comment
+  foo    1.01   ; comment
+  bar  $-1.02   ; no 7.00
+  baz   +0,01 € ; ; ;
+  fizz   AAPL 10
+  bu zz  GOOG  1
   ; comment
-  bar  -1.01
+  quux
 """
-      unclearedTransaction = ['source.ledger', 'meta.transaction.uncleared']
-      expectedLine0 = [
-        {'2015/01/01': unclearedTransaction.concat ['constant.numeric.date.transaction']}
-        {' '         : unclearedTransaction}
-        {'(1000)'    : unclearedTransaction.concat ['entity.payee.transaction', 'constant.other.symbol.code.transaction']}
-        {' '         : unclearedTransaction.concat ['entity.payee.transaction']}
-        {'payee'     : unclearedTransaction.concat ['entity.payee.transaction', 'string.payee.transaction']}
-        {'  '        : unclearedTransaction.concat ['entity.payee.transaction']}
-        {'; comment' : unclearedTransaction.concat ['entity.payee.transaction', 'comment.note.transaction']}
+      transactionTokens = ['source.ledger', 'meta.transaction.uncleared']
+      expectedLines = []
+      expectedLines.push [
+        {'2015/01/01': transactionTokens.concat ['constant.numeric.date.transaction']}
+        {' '         : transactionTokens}
+        {'(1000)'    : transactionTokens.concat ['entity.payee.transaction', 'constant.other.symbol.code']}
+        {' '         : transactionTokens.concat ['entity.payee.transaction']}
+        {'payee'     : transactionTokens.concat ['entity.payee.transaction', 'string.payee.transaction']}
+        {'  '        : transactionTokens.concat ['entity.payee.transaction']}
+        {'; comment' : transactionTokens.concat ['entity.payee.transaction', 'comment.note.transaction']}
       ]
 
-      expect(tokensByLines[0].length).toEqual expectedLine0.length
-      for token, index in expectedLine0
-        for value, scopes of token
-          expect(tokensByLines[0][index].value).toEqual value
-          expect(tokensByLines[0][index].scopes).toEqual scopes
-
-      postingTokens = unclearedTransaction.concat ['entity.transaction.posting']
-      expectedLine1 = [
+      postingTokens = transactionTokens.concat ['entity.transaction.posting']
+      expectedLines.push [
         {'  '        : postingTokens}
         {'foo'       : postingTokens.concat ['string.account']}
-# TODO remove the following match double
-        {' '         : postingTokens}
-        {'  '        : postingTokens}
+        {'    '      : postingTokens}
         {'1.01'      : postingTokens.concat ['constant.numeric.amount']}
+        {'   '       : postingTokens}
+        {'; comment' : postingTokens.concat ['comment.transaction']}
+      ]
+      expectedLines.push [
+        {'  '        : postingTokens}
+        {'bar'       : postingTokens.concat ['string.account']}
+        {'  '        : postingTokens}
+        {'$'         : postingTokens.concat ['constant.other.symbol.commodity']}
+        {'-1.02'     : postingTokens.concat ['constant.numeric.amount']}
+        {'   '       : postingTokens}
+        {'; no 7.00' : postingTokens.concat ['comment.transaction']}
+      ]
+      expectedLines.push [
+        {'  '        : postingTokens}
+        {'baz'       : postingTokens.concat ['string.account']}
+        {'   '       : postingTokens}
+        {'+0,01'     : postingTokens.concat ['constant.numeric.amount']}
+        {' '         : postingTokens}
+        {'€'         : postingTokens.concat ['constant.other.symbol.commodity']}
+        {' '         : postingTokens}
+        {'; ; ;'     : postingTokens.concat ['comment.transaction']}
+      ]
+      expectedLines.push [
+        {'  '        : postingTokens}
+        {'fizz'      : postingTokens.concat ['string.account']}
+        {'   '       : postingTokens}
+        {'AAPL'      : postingTokens.concat ['constant.other.symbol.commodity']}
+        {' '         : postingTokens}
+        {'10'        : postingTokens.concat ['constant.numeric.amount']}
+      ]
+      expectedLines.push [
+        {'  '        : postingTokens}
+        {'bu zz'     : postingTokens.concat ['string.account']}
+        {'  '        : postingTokens}
+        {'GOOG'      : postingTokens.concat ['constant.other.symbol.commodity']}
+        {'  '        : postingTokens}
+        {'1'         : postingTokens.concat ['constant.numeric.amount']}
+      ]
+      expectedLines.push [
         {'  '        : postingTokens}
         {'; comment' : postingTokens.concat ['comment.transaction']}
       ]
+      expectedLines.push [
+        {'  '        : postingTokens}
+        {'quux'      : postingTokens.concat ['string.account']}
+      ]
 
-      expect(tokensByLines[1].length).toEqual expectedLine1.length
-      for token, index in expectedLine1
-        for value, scopes of token
-          expect(tokensByLines[1][index].value).toEqual value
-          expect(tokensByLines[1][index].scopes).toEqual scopes
+      for expectedLine, line in expectedLines
+        expect(tokensByLines[line].length).toEqual expectedLine.length
+        for token, index in expectedLine
+          for value, scopes of token
+            expect(tokensByLines[line][index].value).toEqual value
+            expect(tokensByLines[line][index].scopes).toEqual scopes
 
     it "tokenizes flagged transactions", ->
       {tokens} = grammar.tokenizeLine '2015/01/01 ! 1000 payee  ; comment'
