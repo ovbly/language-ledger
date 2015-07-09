@@ -1,12 +1,29 @@
+{CompositeDisposable} = require 'atom'
 {Ledger} = require 'ledger-cli'
-{TextEditor, CompositeDisposable} = require 'atom'
-fsm = require 'javascript-state-machine'
-pluralize = require 'pluralize'
+
+bufferFilePath = -> atom.workspace.getActivePaneItem()?.buffer.file?.path
+
+# callback: (err, data) -> undefined
+ledgerStats = (journalPath, callback) ->
+  ledger = new Ledger
+    binary: atom.config.get 'language-ledger.ledgerBinary'
+    file: journalPath
+  ledger.stats callback
+
+# callback: (err, data) -> undefined
+ledgerTransactions = (journalPath, callback) ->
+  ledger = new Ledger
+    binary: atom.config.get 'language-ledger.ledgerBinary'
+    file: journalPath
+  # """--limit "uncleared" --empty"""
+  transactions = []
+  err = null
+  ledger.register(['--uncleared'])
+    .on   'data', (entry) -> transactions.push(entry)
+    .once 'error', (err) -> callback(String(err), transactions)
+    .once 'end', () -> callback(null, transactions)
 
 module.exports =
-  output: null
-  subscriptions: null
-
   # Your config schema!
   config:
     ledgerBinary:
@@ -16,33 +33,23 @@ module.exports =
       default: 'path/to/ledger'
 
   activate: (state) ->
-    @output ?= atom.notifications
+    TransactionsView = require './transactions-view'
 
-    bufferFilePath = -> atom.workspace.getActivePaneItem()?.buffer.file?.path
+    @subscriptions = new CompositeDisposable
+    @subscriptions.add atom.workspace.observeTextEditors (editor) =>
+      grammar = editor.getGrammar()
+      return unless grammar.scopeName is 'source.ledger'
 
-    if not @subscriptions
-      @subscriptions = new CompositeDisposable
-      @subscriptions.add atom.workspace.observePaneItems (item) =>
-        return unless item?
-        return unless item instanceof TextEditor
+      new TransactionsView(editor)
+      @handleParserReports(editor)
 
-        editor = item
-        {name} = editor.getGrammar()
-        return unless name is 'Ledger'
+  handleParserReports: (editor) ->
+    notification = null
 
-        buffer = editor.getBuffer()
-        @subscriptions?.add @disposableFor(buffer)
-
-  disposableFor: (buffer) ->
-    # There is just one disposable right now: it passes the buffers file to
-    # Ledger when it is saved. Parser errors will be reported. Also the first
-    # successful pass will be reported. This behavior is modeled by a FSM.
-
-    # One notification per buffer
-    bufferNotification = null
-
-    # One report FSM per buffer
-    bufferReport = fsm.create
+    # Pass the file to Ledger when it is saved. Parser errors will issue a
+    # notification, also the first successful pass. This is modeled by a FSM.
+    FSM = require 'javascript-state-machine'
+    fsm = FSM.create
       initial: 'init'
       events: [
         {name: 'fail', from: ['*'], to: 'error'},
@@ -51,46 +58,53 @@ module.exports =
       ]
       callbacks:
         onpassLoud: (event, from, to, {detail}) =>
-          bufferNotification?.dismiss()
-          bufferNotification = @output.addInfo "Ledger journal errors are fixed\n",
+          notification?.dismiss()
+          notification = atom.notifications.addInfo "Ledger journal errors are fixed\n",
             dismissable: false
             detail: detail
         onfail: (event, from, to, {detail}) =>
-          bufferNotification?.dismiss()
-          bufferNotification = @output.addError "Ledger journal has errors\n",
+          notification?.dismiss()
+          notification = atom.notifications.addError "Ledger journal has errors\n",
             dismissable: true
             detail: detail
 
-    disposable = buffer.onDidSave ({path}) =>
-      ledger = new Ledger
-        binary: atom.config.get 'language-ledger.ledgerBinary'
-        file: path
-      ledger.stats (err, stat) =>
+    buffer = editor.getBuffer()
+    bufferSavedSubscription = buffer.onDidSave (file) =>
+      failDetail = (message) ->
+        parserErrorPattern = /While parsing file +\"(.+)\", line ([\d]+): [\n\r]+([\s\S]+)$/m
+        hasParserError = parserErrorPattern.test message
+
+        if hasParserError
+          blocks = message.match parserErrorPattern
+          error = message.trim().split("\n").pop() # parser error in last line
+          "  in file #{blocks[1]}, line: #{parseInt(blocks[2])}\n#{error}"
+
+      ledgerStats file.path, (err, stat) =>
         if (err?)
-          bufferReport.fail detail: @failDetail(err)
+          fsm.fail detail: failDetail(err)
         else
           detail: null
           if (stat.files?)
             sf = stat.files
+            pluralize = require 'pluralize'
             detail = "  in #{pluralize('file', sf.length)} #{sf.join(', ')}"
-          bufferReport.pass {detail}
+          fsm.pass {detail}
 
-    buffer.onDidDestroy () => @subscriptions?.remove(disposable)
-    return disposable
+    editorDestroyedSubscription = editor.onDidDestroy =>
+      bufferSavedSubscription.dispose()
+      editorDestroyedSubscription.dispose()
+      notification?.dismiss()
+      reportingFsm = null
 
-  failDetail: (message) ->
-    parserErrorPattern = /While parsing file +\"(.+)\", line ([\d]+): [\n\r]+([\s\S]+)$/m
-    hasParserError = parserErrorPattern.test message
+      @subscriptions.remove(bufferSavedSubscription)
+      @subscriptions.remove(editorDestroyedSubscription)
 
-    if hasParserError
-      blocks = message.match parserErrorPattern
-      error = message.trim().split("\n").pop() # parser error in last line
-      "  in file #{blocks[1]}, line: #{parseInt(blocks[2])}\n#{error}"
+    @subscriptions.add(bufferSavedSubscription)
+    @subscriptions.add(editorDestroyedSubscription)
 
   deactivate: ->
     console.log "deactivate"
     @subscriptions?.dispose()
-    @output?.clear()
 
   serialize: ->
     console.log "serialize"

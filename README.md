@@ -24,3 +24,16 @@ pane. It will be used to silently check the journal file anytime it is saved. If
 there are parser errors, a notification is shown.
 
 ![Parser](http://fs1.directupload.net/images/150321/vz2phip4.gif)
+
+## Transaction highlighting
+
+Uncleared and pending transactions are highlighted by default. To customize the
+highlighting, call the <kbd>Application: Open Your Stylesheet</kbd> command to
+open `styles.less` and define the new highlighting styles there.
+
+For example, add this snippet to disable highlighting of uncleared transactions:
+```less
+atom-text-editor::shadow .ledger-transaction-uncleared .region {
+  background-color: transparent;
+}
+```
