@@ -16,7 +16,7 @@ repository:
     name: "string.account"
   commodity:
     match: "([^\\s#%|\\*\\;\\(\\)\\]\\[]+)"
-    name: "string.commodity"
+    name: "constant.other.symbol.commodity"
   comment_line:
     match: "^[\\;#%|\\*].*$"
     name: "comment.line"
@@ -55,21 +55,33 @@ repository:
         (\\s{2,}(\\;.*))? $
     "
     captures:
-      1: {name: "constant.other.symbol.code.transaction"}
+      1: {name: "constant.other.symbol.code"}
       3: {name: "string.payee.transaction"}
       5: {name: "comment.note.transaction"}
-  transaction_amount:
-    match: "\\s{2}([\\-\\+]?\\d+([,\\.]\\d+)*)"
+  account_and_amount:
+    match: "(.+?)\\s{2,}(.*?)([\\-\\+]?\\d+([,\\.]\\d+)*)([^\\;]*)"
     captures:
-      1: {name: "constant.numeric.amount"}
+      1:
+         patterns: [
+           {include: "#account"}
+         ]
+      2:
+         patterns: [
+           {include: "#commodity"}
+         ]
+      3: {name: "constant.numeric.amount"}
+      5:
+         patterns: [
+           {include: "#commodity"}
+         ]
   transaction_posting:
     name: "entity.transaction.posting"
     begin: "^(\\s+)"
     end: "$"
     patterns: [
       {include: "#transaction_comment"}
+      {include: "#account_and_amount"}
       {include: "#account"}
-      {include: "#transaction_amount"}
     ]
   transaction_uncleared:
     name: "meta.transaction.uncleared"
