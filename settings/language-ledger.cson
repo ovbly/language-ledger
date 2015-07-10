@@ -2,7 +2,7 @@
   editor:
     commentStart: '; '       # editor:toggle-line-comments
     autoIndent: true         # can be set in root scope only
-    autoIndentOnPaste: true  # can be set in root scope only
+    autoIndentOnPaste: false # can be set in root scope only
     foldEndPattern: "'^\\s*"
     increaseIndentPattern: '$.' # does never match
     decreaseIndentPattern: '(?x) ^ \\s* (
