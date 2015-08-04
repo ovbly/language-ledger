@@ -112,11 +112,11 @@ class TransactionsView
   addHighlightings: (region) ->
     for {rowStart, rowEnd, scope} in region
       if scope is 'meta.transaction.cleared'
-        @highlightRange(rowStart, rowEnd, 'transaction-cleared')
+        @highlightRange(rowStart, rowEnd, 'ledger-transaction-cleared')
       if scope is 'meta.transaction.uncleared'
-        @highlightRange(rowStart, rowEnd, 'transaction-uncleared')
+        @highlightRange(rowStart, rowEnd, 'ledger-transaction-uncleared')
       if scope is 'meta.transaction.pending'
-        @highlightRange(rowStart, rowEnd, 'transaction-pending')
+        @highlightRange(rowStart, rowEnd, 'ledger-transaction-pending')
     return
 
   highlightRange: (rowStart, rowEnd, klass) ->
