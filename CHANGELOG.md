@@ -1,3 +1,6 @@
+## 0.3.2
+* Improved transaction syntax highlighting
+
 ## 0.3.0
 * Status-based transaction highlighting
 * Commands to move between transactions
