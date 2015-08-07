@@ -59,7 +59,7 @@ repository:
       3: {name: "string.payee.transaction"}
       5: {name: "comment.note.transaction"}
   account_and_amount:
-    match: "(.+?)\\s{2,}(.*?)([\\-\\+]?\\d+([,\\.]\\d+)*)([^\\;]*)"
+    match: "(.+?)\\s{2,}(.*?)([\\-\\+]?\\d+([,\\.]\\d+)*)([^\\;\\n\\r]*)"
     captures:
       1:
          patterns: [
