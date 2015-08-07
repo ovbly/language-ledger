@@ -11,6 +11,8 @@
     | (apply\\ tag)
     | (end\\ tag)
     )' # decrease indent eval on non-whitespace insertion only
+  whitespace:
+    ensureSingleTrailingNewline: true
 
 '.source.ledger .meta.directive':
   autocomplete:
