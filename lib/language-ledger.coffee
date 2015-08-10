@@ -30,7 +30,7 @@ module.exports =
       title: 'Ledger binary'
       description: 'Full path to the Ledger binary'
       type: 'string'
-      default: 'path/to/ledger'
+      default: 'ledger'
 
   activate: (state) ->
     TransactionsView = require './transactions-view'

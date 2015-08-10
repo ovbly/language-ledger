@@ -19,9 +19,10 @@ indicates when autocompletion is about to be triggered.
 
 ## Parser error reports
 
-The *Ledger binary* should be set in the `ledger-language` package settings
-pane. It will be used to silently check the journal file anytime it is saved. If
-there are parser errors, a notification is shown.
+In case it is not accessible from PATH, the *Ledger binary* should be set in the
+`ledger-language` package settings pane. It will be used to silently check the
+journal file anytime it is saved. If there are parser errors, a notification is
+shown.
 
 ![Parser](http://fs1.directupload.net/images/150321/vz2phip4.gif)
 
