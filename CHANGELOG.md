@@ -1,3 +1,6 @@
+## 0.3.3
+* Recognize ledger if available in PATH
+
 ## 0.3.2
 * Improved transaction syntax highlighting
 
