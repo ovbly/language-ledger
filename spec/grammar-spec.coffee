@@ -1,10 +1,8 @@
-{TextEditor} = require 'atom'
-path = require 'path'
-
 describe "Ledger grammar", ->
   [grammar] = []
 
   beforeEach ->
+    path = require 'path'
     grammarFile = path.join __dirname, '../grammars/ledger.cson'
     grammar = atom.grammars.readGrammarSync grammarFile
 
@@ -183,7 +181,7 @@ end #{directive}
         atom.packages.activatePackage('language-ledger')
 
     expectPreservedIndentation = (text) ->
-      editor = new TextEditor({})
+      editor = atom.workspace.buildTextEditor()
       editor.setGrammar(grammar)
 
       editor.insertText(text)
@@ -211,7 +209,7 @@ end #{directive}
     it "preserves fixture indentation", ->
       fixture = null
       waitsForPromise ->
-        atom.project.open('drewr3.dat', autoIndent: false).then (o) -> fixture = o
+        atom.workspace.open('drewr3.dat', autoIndent: false).then (o) -> fixture = o
 
       runs ->
         expectPreservedIndentation fixture.getText()

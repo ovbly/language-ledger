@@ -1,4 +1,3 @@
-path = require 'path'
 TransactionsView = require '../lib/transactions-view'
 
 describe "Ledger transactions view", ->
@@ -40,7 +39,7 @@ describe "Ledger transactions view", ->
     beforeEach ->
       fixture = null
       waitsForPromise ->
-        atom.project.open('drewr3.dat').then (o) -> fixture = o
+        atom.workspace.open('drewr3.dat').then (o) -> fixture = o
 
       runs ->
         @editor = fixture
@@ -60,9 +59,9 @@ describe "Ledger transactions view", ->
       advanceClock(@editor.getBuffer().stoppedChangingDelay)
 
       markers = @editor.findMarkers(class: 'transaction')
-      expect(markers.length).toEqual 11
+      expect(markers.length).toEqual 22
 
-      expect(editorView.rootElement.querySelectorAll('.highlight').length).not.toBeLessThan 11
+      expect(editorView.rootElement.querySelectorAll('.highlight').length).not.toBeLessThan markers.length
 
   describe "move-to-next-transaction/move-to-previous-transaction events", ->
     [editorView] = []
