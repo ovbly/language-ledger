@@ -1,3 +1,6 @@
+## 0.3.4
+* Refresh specs with API update
+
 ## 0.3.3
 * Recognize ledger if available in PATH
 
