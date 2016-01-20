@@ -71,7 +71,7 @@ module.exports =
     buffer = editor.getBuffer()
     bufferSavedSubscription = buffer.onDidSave (file) =>
       failDetail = (message) ->
-        parserErrorPattern = /While parsing file +\"(.+)\", line ([\d]+): [\n\r]+([\s\S]+)$/m
+        parserErrorPattern = /While parsing file +\"(.+)\", line ([\d]+): ?[\n\r]+([\s\S]+)$/m
         hasParserError = parserErrorPattern.test message
 
         if hasParserError
