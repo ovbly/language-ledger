@@ -24,10 +24,10 @@ describe "Ledger transactions view", ->
       editor.insertNewline()
 
     it "retrieves the transactions", ->
-      expect(transactionsView.getTransactions(['meta.transaction.cleared']).length).toBe 1
-      expect(transactionsView.getTransactions(['meta.transaction.uncleared']).length).toBe 1
-      expect(transactionsView.getTransactions(['meta.transaction.pending']).length).toBe 1
-      expect(transactionsView.getTransactions().length).toBe 3
+      expect(TransactionsView.getTransactions(editor, ['meta.transaction.cleared']).length).toBe 1
+      expect(TransactionsView.getTransactions(editor, ['meta.transaction.uncleared']).length).toBe 1
+      expect(TransactionsView.getTransactions(editor, ['meta.transaction.pending']).length).toBe 1
+      expect(TransactionsView.getTransactions(editor).length).toBe 3
 
     it "marks the transactions", ->
       advanceClock(editor.getBuffer().stoppedChangingDelay)
@@ -46,10 +46,10 @@ describe "Ledger transactions view", ->
         @transactionsView = new TransactionsView(@editor)
 
     it "retrieves the transactions", ->
-      expect(@transactionsView.getTransactions().length).toBe 11
-      expect(@transactionsView.getTransactions(["meta.transaction.cleared"]).length).toBe 2
-      expect(@transactionsView.getTransactions(["meta.transaction.uncleared"]).length).toBe 9
-      expect(@transactionsView.getTransactions(["meta.transaction.pending"]).length).toBe 0
+      expect(TransactionsView.getTransactions(@editor).length).toBe 11
+      expect(TransactionsView.getTransactions(@editor, ["meta.transaction.cleared"]).length).toBe 2
+      expect(TransactionsView.getTransactions(@editor, ["meta.transaction.uncleared"]).length).toBe 9
+      expect(TransactionsView.getTransactions(@editor, ["meta.transaction.pending"]).length).toBe 0
 
     it "marks the transactions", ->
       @editor.setGrammar(atom.grammars.selectGrammar('source.ledger'))

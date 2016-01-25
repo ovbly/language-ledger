@@ -1,3 +1,6 @@
+## 0.3.5
+* Transform view to ES6
+
 ## 0.3.4
 * Refresh specs with API update
 
