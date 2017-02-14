@@ -32,7 +32,7 @@ describe "Ledger transactions view", ->
     it "marks the transactions", ->
       advanceClock(editor.getBuffer().stoppedChangingDelay)
 
-      markers = editor.findMarkers(class: 'transaction')
+      markers = editor.findMarkers()
       expect(markers.length).toEqual 3
 
   describe "when the editor is showing fixture", ->
@@ -58,10 +58,14 @@ describe "Ledger transactions view", ->
 
       advanceClock(@editor.getBuffer().stoppedChangingDelay)
 
-      markers = @editor.findMarkers(class: 'transaction')
-      expect(markers.length).toEqual 22
+      markers = @editor.findMarkers()
+      expect(markers.length).toEqual 11
 
-      expect(editorView.rootElement.querySelectorAll('.highlight').length).not.toBeLessThan markers.length
+      decorationsCls = []
+      decorationObserverDisposable = @editor.observeDecorations((decoration) -> decorationsCls.push(decoration.getProperties().class))
+      decorationObserverDisposable.dispose()
+
+      expect(decorationsCls.filter((cls) -> cls.includes('ledger-transaction')).length).toEqual markers.length
 
   describe "move-to-next-transaction/move-to-previous-transaction events", ->
     [editorView] = []
