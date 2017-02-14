@@ -59,7 +59,7 @@ describe "Ledger transactions view", ->
       advanceClock(@editor.getBuffer().stoppedChangingDelay)
 
       markers = @editor.findMarkers()
-      expect(markers.length).toEqual 11
+      expect(markers.length).toEqual 22
 
       decorationsCls = []
       decorationObserverDisposable = @editor.observeDecorations((decoration) -> decorationsCls.push(decoration.getProperties().class))
