@@ -99,6 +99,7 @@
     symbols:
       Account:
         selector: '.string.account'
+        suggestionPriority: 2
 
 '.source.ledger .string.payee':
   autocomplete:

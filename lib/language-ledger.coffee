@@ -1,5 +1,6 @@
 {CompositeDisposable} = require 'atom'
 {Ledger} = require 'ledger-cli'
+autocompleteProvider = require './autocomplete-provider'
 
 bufferFilePath = -> atom.workspace.getActivePaneItem()?.buffer.file?.path
 
@@ -24,13 +25,14 @@ ledgerTransactions = (journalPath, callback) ->
     .once 'end', () -> callback(null, transactions)
 
 module.exports =
-  # Your config schema!
   config:
     ledgerBinary:
       title: 'Ledger binary'
       description: 'Full path to the Ledger binary'
       type: 'string'
       default: 'ledger'
+
+  getProvider: -> autocompleteProvider
 
   activate: (state) ->
     TransactionsView = require './transactions-view'

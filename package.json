@@ -1,12 +1,19 @@
 {
   "name": "language-ledger",
   "main": "./lib/language-ledger",
-  "version": "0.3.5",
+  "version": "0.4.5",
   "description": "Ledger language support in Atom",
   "repository": "https://github.com/4ourbit/language-ledger",
   "license": "MIT",
   "engines": {
     "atom": ">=1.2.0"
+  },
+  "providedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "4.0.0": "getProvider"
+      }
+    }
   },
   "dependencies": {
     "javascript-state-machine": "^2.3.5",
